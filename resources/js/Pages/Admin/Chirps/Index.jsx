@@ -1,0 +1,92 @@
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link, useForm } from '@inertiajs/react';
+
+export default function Index({ auth, title, chirps }) {
+    const { delete: destroy } = useForm();
+
+    const handleDelete = (id) => {
+        if (confirm('Are you sure you want to delete this chrip?')) {
+            destroy(route('chrips.destroy', id));
+        }
+    };
+
+
+    const truncateHtml = (htmlString, maxLength) => {
+        const tempElement = document.createElement('div');
+        tempElement.innerHTML = htmlString;
+
+        // Ambil teks murni dan ganti enter dengan spasi
+        const textContent = (tempElement.textContent || tempElement.innerText || '').replace(/\n|\r\n|\t/g, " ");
+
+        const truncatedText = textContent.length > maxLength
+            ? `${textContent.substring(0, maxLength)}...`
+            : textContent;
+
+        return truncatedText;
+    };
+
+    return (
+        <AuthenticatedLayout>
+            <Head title={title} />
+
+            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div className="p-6 bg-white border-b border-gray-200">
+                        <h1 className="text-xl font-semibold mb-4">Chirps Management</h1>
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">User Name</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Chirp</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Created At</th>
+                                    <th className="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {chirps.map((chirp) => (
+                                    <tr key={chirp.id}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{chirp.user.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><span>{ truncateHtml(chirp.message, 40) }</span></td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {
+                                                new Date(chirp.created_at).toLocaleDateString('id-ID', {
+                                                day: '2-digit',
+                                                month: 'long',
+                                                year: 'numeric',
+                                                })
+                                            }
+                                        </td>
+                                        <td>
+                                            <Link
+                                                href={route('admin.chirps.show', chirp.id)}
+                                                className="text-green-600 hover:text-green-900 mr-2"
+                                            >
+                                                Detail
+                                            </Link>
+                                            <Link
+                                                href={route('admin.chirps.edit', chirp.id)}
+                                                className="text-yellow-600 hover:text-yellow-900 mr-2"
+                                            >
+                                                Report
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(chirp.id)}
+                                                className="text-red-600 hover:text-red-900"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        {chirps.length === 0 && (
+                            <p className="text-gray-500 mt-4">No chirps found.</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </AuthenticatedLayout>
+    );
+}
