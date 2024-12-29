@@ -57,6 +57,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Chirps Management
                                     </NavLink>
                                 )}
+
+                                {isAdmin && (
+                                    <NavLink
+                                        href={route('admin.reports.index')}
+                                        active={route().current('admin.reports.index')}
+                                    >
+                                        Reports Management
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
@@ -186,6 +195,14 @@ export default function AuthenticatedLayout({ header, children }) {
                             </ResponsiveNavLink>
                         )}
 
+                        {isAdmin && (
+                            <ResponsiveNavLink
+                                href={route('admin.reports.index')}
+                                active={route().current('admin.reports.index')}
+                            >
+                                Reports Management
+                            </ResponsiveNavLink>
+                        )}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
