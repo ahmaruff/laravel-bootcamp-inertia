@@ -2,8 +2,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import React, { useRef, useState } from "react";
 import ChirpModal from '@/Components/ChirpModal';
+import CreateReportModal from '@/Components/CreateReportModal';
 
-export default function Index({ auth, title, chirps }) {
+export default function Index({ user, title, chirps }) {
     const { delete: destroy } = useForm();
 
     const handleDelete = (id) => {
@@ -41,6 +42,24 @@ export default function Index({ auth, title, chirps }) {
         selectedChirpRef.current = null; // Clear the selected chirp
     };
 
+    const [isCreateReportModalOpen, setCreateReportModalOpen] = useState(false);
+    const userIdRef = useRef(null);
+    const chirpIdRef = useRef(null);
+
+    const openCreateReportModal = (userId, chirpId) => {
+        userIdRef.current = userId;
+        chirpIdRef.current = chirpId;
+        setCreateReportModalOpen(true);
+    };
+
+    const closeCreateReportModal = () => {
+        userIdRef.current = null;
+        chirpIdRef.current = null;
+
+        setCreateReportModalOpen(false);
+    };
+
+
     return (
         <AuthenticatedLayout>
             <Head title={title} />
@@ -54,6 +73,14 @@ export default function Index({ auth, title, chirps }) {
                 />
             )}
 
+            {userIdRef && chirpIdRef && (
+                <CreateReportModal
+                    isOpen={isCreateReportModalOpen}
+                    onClose={closeCreateReportModal}
+                    userId ={userIdRef.current}
+                    chirpId ={chirpIdRef.current}
+                />
+            )}
             <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
@@ -88,12 +115,12 @@ export default function Index({ auth, title, chirps }) {
                                             >
                                                 Detail
                                             </button>
-                                            <Link
-                                                href={route('admin.chirps.edit', chirp.id)}
+                                            <button
+                                                onClick={() => openCreateReportModal(user.id, chirp.id)}
                                                 className="text-yellow-600 hover:text-yellow-900 mr-2"
                                             >
                                                 Report
-                                            </Link>
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(chirp.id)}
                                                 className="text-red-600 hover:text-red-900"
