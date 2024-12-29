@@ -1,5 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import React, { useRef, useState } from "react";
+import ChirpModal from '@/Components/ChirpModal';
 
 export default function Index({ auth, title, chirps }) {
     const { delete: destroy } = useForm();
@@ -25,9 +27,32 @@ export default function Index({ auth, title, chirps }) {
         return truncatedText;
     };
 
+
+    const [isModalOpen, setModalOpen] = useState(false);
+    const selectedChirpRef = useRef(null); // Use a ref for the selected chirp
+
+    const openModal = (chirp) => {
+        selectedChirpRef.current = chirp; // Set the selected chirp in the ref
+        setModalOpen(true); // Open the modal
+    };
+
+    const closeModal = () => {
+        setModalOpen(false); // Close the modal
+        selectedChirpRef.current = null; // Clear the selected chirp
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title={title} />
+
+            {/* Chirp Modal */}
+            {selectedChirpRef && (
+                <ChirpModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    chirp={selectedChirpRef.current}
+                />
+            )}
 
             <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -57,12 +82,12 @@ export default function Index({ auth, title, chirps }) {
                                             }
                                         </td>
                                         <td>
-                                            <Link
-                                                href={route('admin.chirps.show', chirp.id)}
+                                            <button
+                                                onClick={() => openModal(chirp)}
                                                 className="text-green-600 hover:text-green-900 mr-2"
                                             >
                                                 Detail
-                                            </Link>
+                                            </button>
                                             <Link
                                                 href={route('admin.chirps.edit', chirp.id)}
                                                 className="text-yellow-600 hover:text-yellow-900 mr-2"
@@ -87,6 +112,7 @@ export default function Index({ auth, title, chirps }) {
                     </div>
                 </div>
             </div>
+
         </AuthenticatedLayout>
     );
 }
