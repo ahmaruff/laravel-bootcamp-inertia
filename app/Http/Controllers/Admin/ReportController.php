@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class ReportController extends Controller
@@ -36,7 +37,20 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rules = [
+            'user_id' => ['required', 'exists:users,id'],
+            'chirp_id' => ['required', 'exists:chirps,id'],
+            'notes' => ['sometimes', 'nullable', 'string'],
+            'is_resolved' => ['sometimes', 'nullable', 'boolean']
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        $validated = $validator->valid();
+
+        $report = Report::create($validated);
+
+        return redirect()->back();
     }
 
     /**
