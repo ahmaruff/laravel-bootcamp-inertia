@@ -33,6 +33,14 @@ Route::resource('chirps', ChirpController::class)
 Route::resource('users', UserController::class)
     ->only(['index', 'store', 'edit', 'update', 'destroy'])
     ->middleware(['auth', 'is-admin']);
-    
+
+
+Route::group([
+    'middleware' => ['auth', 'verified'],
+    'prefix' => 'admin',
+    'as' => 'admin.'
+],function() {
+    Route::resource('chirps', \App\Http\Controllers\Admin\ChirpController::class);
+});
 
 require __DIR__.'/auth.php';
