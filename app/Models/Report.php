@@ -23,7 +23,7 @@ class Report extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function chrip() : BelongsTo
+    public function chirp() : BelongsTo
     {
         return $this->belongsTo(Chirp::class);
     }
