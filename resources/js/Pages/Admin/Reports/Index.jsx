@@ -46,9 +46,9 @@ export default function Index({ auth, title, reports }) {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {reports.map((report) => (
                                     <tr key={report.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.user.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><span>{ truncateHtml(report.chirp.message, 40) }</span></td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.notes}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.user ? report.user.name : '>user missing or deleted<'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><span>{ truncateHtml(report.chirp ? report.chirp.message : '>chrip missing or deleted<', 40) }</span></td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.notes ? report.notes : ''}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {report.isResolved
                                                 ? (<span className="text-sm text-green-600">Resolved</span>)
