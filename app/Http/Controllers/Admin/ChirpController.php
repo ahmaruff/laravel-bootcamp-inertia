@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Chirp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ChirpController extends Controller
@@ -67,8 +69,16 @@ class ChirpController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Chirp $chirp)
     {
-        //
+        Gate::authorize('delete', $chirp);
+
+        $path = $chirp->image;
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+        $chirp->delete();
+
+        return redirect(route('admin.chirps.index'));
     }
 }
