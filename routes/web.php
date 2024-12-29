@@ -36,7 +36,7 @@ Route::resource('users', UserController::class)
 
 
 Route::group([
-    'middleware' => ['auth', 'verified'],
+    'middleware' => ['auth', 'is-admin'],
     'prefix' => 'admin',
     'as' => 'admin.'
 ],function() {
