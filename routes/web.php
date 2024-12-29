@@ -41,6 +41,7 @@ Route::group([
     'as' => 'admin.'
 ],function() {
     Route::resource('chirps', \App\Http\Controllers\Admin\ChirpController::class);
+    Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class);
 });
 
 require __DIR__.'/auth.php';
