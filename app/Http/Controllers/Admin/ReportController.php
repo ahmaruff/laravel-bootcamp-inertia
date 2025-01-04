@@ -82,7 +82,24 @@ class ReportController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $rules = [
+            'notes' => ['sometimes', 'nullable', 'string'],
+            'is_resolved' => ['sometimes', 'nullable', 'boolean']
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        $report = Report::findOrFail($id);
+        $report->update($validated);
+
+        return redirect('/admin/reports');
     }
 
     /**

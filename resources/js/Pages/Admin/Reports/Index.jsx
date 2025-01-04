@@ -3,6 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import React, { useRef, useState } from "react";
 
 export default function Index({ auth, title, reports }) {
+    console.log(reports);
     const { delete: destroy } = useForm();
 
     const handleDelete = (id) => {
@@ -51,7 +52,7 @@ export default function Index({ auth, title, reports }) {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><span>{ truncateHtml(report.chirp ? report.chirp.message : '>chrip missing or deleted<', 40) }</span></td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.notes ? report.notes : ''}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {report.isResolved
+                                                {report.is_resolved
                                                     ? (<span className="text-sm text-green-600">Resolved</span>)
                                                     : (<span className="text-sm text-red-600">Not Resolved</span>)
                                                 }
