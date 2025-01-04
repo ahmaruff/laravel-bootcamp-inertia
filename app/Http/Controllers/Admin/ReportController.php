@@ -64,9 +64,17 @@ class ReportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Report $report)
     {
-        //
+        $report->load('user');
+        $report->load('chirp');
+        $report->load('chirp.user');
+
+        return Inertia::render('Admin/Reports/Edit', [
+            'user' => Auth::user(),
+            'title' => 'Detail Report',
+            'report' => $report,
+        ]);
     }
 
     /**

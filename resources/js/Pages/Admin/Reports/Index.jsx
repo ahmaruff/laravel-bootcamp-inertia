@@ -33,52 +33,48 @@ export default function Index({ auth, title, reports }) {
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
                         <h1 className="text-xl font-semibold mb-4">Reports Management</h1>
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Reporter</th>
-                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Chirp</th>
-                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Notes</th>
-                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Status</th>
-                                    <th className="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {reports.map((report) => (
-                                    <tr key={report.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.user ? report.user.name : '>user missing or deleted<'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><span>{ truncateHtml(report.chirp ? report.chirp.message : '>chrip missing or deleted<', 40) }</span></td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.notes ? report.notes : ''}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {report.isResolved
-                                                ? (<span className="text-sm text-green-600">Resolved</span>)
-                                                : (<span className="text-sm text-red-600">Not Resolved</span>)
-                                            }
-                                        </td>
-                                        <td>
-                                            <button
-                                                onClick={() => openModal(report)}
-                                                className="text-green-600 hover:text-green-900 mr-2"
-                                            >
-                                                Detail
-                                            </button>
-                                            <Link
-                                                href={route('admin.reports.edit', report.id)}
-                                                className="text-yellow-600 hover:text-yellow-900 mr-2"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(report.id)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
+                        <div class="overflow-x-scroll">
+                            <table className="min-w-full divide-y divide-gray-200 table-auto">
+                                <thead>
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Reporter</th>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Chirp</th>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Notes</th>
+                                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Status</th>
+                                        <th className="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {reports.map((report) => (
+                                        <tr key={report.id}>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.user ? report.user.name : '>user missing or deleted<'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><span>{ truncateHtml(report.chirp ? report.chirp.message : '>chrip missing or deleted<', 40) }</span></td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.notes ? report.notes : ''}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {report.isResolved
+                                                    ? (<span className="text-sm text-green-600">Resolved</span>)
+                                                    : (<span className="text-sm text-red-600">Not Resolved</span>)
+                                                }
+                                            </td>
+                                            <td>
+                                                <Link
+                                                    href={route('admin.reports.edit', report.id)}
+                                                    className="text-yellow-600 hover:text-yellow-900 mr-2"
+                                                >
+                                                    Detail
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(report.id)}
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
                         {reports.length === 0 && (
                             <p className="text-gray-500 mt-4">No chirps found.</p>
