@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Report;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -100,6 +101,30 @@ class ReportController extends Controller
         $report->update($validated);
 
         return redirect('/admin/reports');
+    }
+
+    public function updateUserStatus(Request $request, $userId)
+    {
+        $validated = $request->validate([
+            'is_active' => 'required|boolean',
+        ]);
+
+        $user = User::findOrFail($userId);
+
+        // Update is_active
+        $user->is_active = $validated['is_active'];
+
+        // Simpan perubahan ke database
+        $user->save();
+
+        $returnData = [
+            'status' => 'success',
+            'code' => 200,
+            'data' => [
+                'user' => $user
+            ],
+        ];
+        return response()->json($returnData, 200);
     }
 
     /**

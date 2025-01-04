@@ -40,6 +40,8 @@ Route::group([
     'prefix' => 'admin',
     'as' => 'admin.'
 ],function() {
+    Route::put('/reports/update-user-status/{userId}', [\App\Http\Controllers\Admin\ReportController::class, 'updateUserStatus'])->name('reports.update-user-status');
+
     Route::resource('chirps', \App\Http\Controllers\Admin\ChirpController::class);
     Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class);
 });

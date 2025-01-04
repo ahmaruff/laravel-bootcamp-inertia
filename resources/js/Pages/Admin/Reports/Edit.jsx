@@ -6,8 +6,12 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import { Head, useForm } from '@inertiajs/react';
 import React, { useRef, useState, useEffect} from "react";
 import TextEditor from "@/Components/TextEditor";
+import { router, usePage } from '@inertiajs/react';
 
 export default function Edit({ report }) {
+    const props = usePage().props;
+    console.log(props, props.csrf_token);
+
     const { data, setData, put, processing, errors } = useForm({
         notes : report.notes,
         is_resolved : report.is_resolved,
@@ -25,7 +29,14 @@ export default function Edit({ report }) {
 
     useEffect(() => {
         if (trixInput.current) {
-            trixInput.current.editor.loadHTML((report.chirp && report.chirp.message) ? report.chirp.message : '');
+            const editor = trixInput.current.editor;
+            if (report.chirp && report.chirp.message) {
+                // Load the chirp message into the editor
+                editor.loadHTML(report.chirp.message);
+            } else {
+                // Clear the editor content if chirp is deleted
+                editor.loadHTML('');
+            }
         }
     }, [report.chirp]);
 
@@ -34,6 +45,76 @@ export default function Edit({ report }) {
         const hashtags = report.chirp.hashtags ? report.chirp.hashtags.split('|') : [];
     }
 
+
+    // DELETE CHIRP
+    const [isChirpDeleted, setIsChirpDeleted] = useState(report.chirp ? false : true);
+
+    const handleDeleteChirp = (id) => {
+        if (!id) {
+            console.error('Invalid chirp ID');
+            return;
+        }
+        const confirmed = window.confirm('Are you sure you want to delete this chirp? This action cannot be undone.');
+        if (confirmed) {
+            const formData = new FormData();
+            formData.append('_method', 'DELETE');
+            formData.append('_token', props.csrf_token);
+            // Perform delete action
+            fetch(`/admin/chirps/${id}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then((response) => {
+                if (response.ok) {
+                    console.log('Chirp deleted successfully!');
+                    setIsChirpDeleted(true);
+                    if (trixInput.current) {
+                        trixInput.current.editor.loadHTML('');
+                    }
+                } else {
+                    console.error('Failed to delete chirp');
+                }
+            })
+            .catch((error) => console.error('Error:', error));
+        }
+    };
+
+    const [isUserActive, setIsUserActive] = useState((report.user && report.user.is_active == true) ? true : false);
+    const handleIsActiveUser = (id) => {
+        if (!id) {
+            console.error('Invalid user ID');
+            return;
+        }
+
+        // Toggle the active state locally
+        const newIsActive = !isUserActive;
+        setIsUserActive(newIsActive);
+
+        // Send the request to update the user status
+        fetch(`/admin/reports/update-user-status/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': props.csrf_token,
+            },
+            body: JSON.stringify({ is_active: newIsActive }),
+        })
+        .then((response) => {
+            console.log(response);
+            if (response.ok) {
+                console.log('User status updated successfully!');
+            } else {
+                console.error('Failed to update user status');
+                // Revert the UI change if the request failed
+                setIsUserActive(!newIsActive);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            setIsUserActive(!newIsActive);
+        });
+
+    }
     return (
         <AuthenticatedLayout>
             <Head title="Detail Report" />
@@ -42,9 +123,9 @@ export default function Edit({ report }) {
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
                         <h1 className="text-xl font-semibold mb-4">Detail Report</h1>
-                        <div>
-                            <h1 className="text-lg font-semibold mb-2">User</h1>
-                            <div className='my-4 flex flex-col justify-start items-start'>
+                        <div className="my-2">
+                            <div className="flex flex-row justify-between items-center">
+                                <h1 className="text-lg font-semibold mb-2">User</h1>
                                 <div className='flex flex-row justify-start items-center'>
                                     <div className='flex flex-col'>
                                         {report.user ? report.user.name : ''}
@@ -53,10 +134,46 @@ export default function Edit({ report }) {
                                         {report.user ? report.user.email : ''}
                                     </div>
                                 </div>
+                                <div className="flex flex-row gap-2">
+                                    <span>Inactive </span>
+                                    <div className="flex items-center">
+                                        {/* Toggle switch */}
+                                        <label htmlFor="toggle" className="inline-flex relative items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                id="toggle"
+                                                className="sr-only"
+                                                checked={isUserActive}
+                                                onChange={() => handleIsActiveUser(report.user ? report.user.id : null)}
+                                            />
+                                            <div className={`w-10 h-4 rounded-full ${isUserActive ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                                            <div
+                                                className={`w-6 h-6 border-2 bg-white rounded-full absolute left-0 transition-all ${
+                                                    isUserActive ? 'translate-x-6 bg-green-500 border-green-500' : 'translate-x-0 bg-gray-200 border-gray-400'
+                                                }`}
+                                            ></div>
+                                        </label>
+                                    </div>
+                                    <span className="ml-2">Active</span>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <h1 className="text-lg font-semibold mb-2">Chrip</h1>
+                        <div className="my-2">
+                            <div className="flex flex-row justify-between items-center">
+                                <h1 className="text-lg font-semibold mb-2">Chrip</h1>
+                                <div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteChirp(report.chirp ? report.chirp.id : null)}
+                                        disabled={isChirpDeleted} // Disable button if chirp is deleted
+                                        className={`ml-4 px-4 py-2 rounded-md ${
+                                            isChirpDeleted ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-red-500 text-white'
+                                        }`}
+                                    >
+                                    {isChirpDeleted ? 'Chirp is Deleted' : 'Delete Chirp'}
+                                    </button>
+                                </div>
+                            </div>
                             <div className='mt-4 flex flex-col justify-start items-start'>
                                 <div className='flex flex-row justify-start items-center'>
                                     {(report.chirp ? report.chirp.image : '')  && (
