@@ -108,13 +108,8 @@ class ReportController extends Controller
         $validated = $request->validate([
             'is_active' => 'required|boolean',
         ]);
-
         $user = User::findOrFail($userId);
-
-        // Update is_active
         $user->is_active = $validated['is_active'];
-
-        // Simpan perubahan ke database
         $user->save();
 
         $returnData = [
@@ -130,8 +125,10 @@ class ReportController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Report $report)
     {
-        //
+        $report->delete();
+
+        return redirect(route('admin.reports.index'));
     }
 }

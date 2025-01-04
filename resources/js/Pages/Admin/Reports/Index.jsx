@@ -8,7 +8,7 @@ export default function Index({ auth, title, reports }) {
 
     const handleDelete = (id) => {
         if (confirm('Are you sure you want to delete this reports?')) {
-            destroy(route('admin.chirps.destroy', id));
+            destroy(route('admin.reports.destroy', id));
         }
     };
 
